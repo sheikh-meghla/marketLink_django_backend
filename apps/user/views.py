@@ -10,8 +10,8 @@ from .serializers import (
     SignInSerializer,
     SignOutSerializer,
     ChangePasswordSerializer,
-
     VendorProfileSerializer,
+    UpdateVendorProfileSerializer,
 )
 
 
@@ -24,7 +24,9 @@ class SignUpView(APIView):
         serializer = SignUpSerializer(data=request.data)
 
         if serializer.is_valid():
+
             serializer.save()
+
             return Response({
                 "status" : "success",
                 "message" : "User registered successfully.",
@@ -39,6 +41,7 @@ class SignInView(APIView):
     def post(self, request):
         
         serializer = SignInSerializer(data=request.data)
+        
         if serializer.is_valid():
             return Response({
                 "status" : "success",
@@ -69,7 +72,7 @@ class ChangePasswordView(APIView):
     authentication_classes = [JWTAuthentication]
 
     def post(self, request):
-        serializer = ChangePasswordSerializer(data=request.data)
+        serializer = ChangePasswordSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response({
@@ -93,15 +96,15 @@ class UpdateProfileView(APIView):
         user = request.user
 
         try:
-            userProfile = VendorProfile.objects.select_related('user').get(user=user)
+            userProfile = VendorProfile.objects.select_related('vendor').get(vendor=user)
+            
         except VendorProfile.DoesNotExist:
             return Response({
                 "status" : "error",
-                "message" : "User profile not found.",
-                "data" : serializer.data
+                "message" : "User profile not found."
             })
 
-        serializer = VendorProfileSerializer(userProfile, data=request.data, partial=True)
+        serializer = UpdateVendorProfileSerializer(userProfile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response({
@@ -112,7 +115,7 @@ class UpdateProfileView(APIView):
         raise ValidationError(serializer.errors)
 
 
-class ProfileGet(APIView):
+class MyProfileView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
@@ -121,12 +124,14 @@ class ProfileGet(APIView):
 
         try:
             profile = VendorProfile.objects.select_related('vendor').get(vendor=vendor)
+
         except VendorProfile.DoesNotExist:
             return Response({
                 "status" : "error",
                 "message" : "User profile not found.",
                 "data" : serializer.data
             })
+        
         serializer = VendorProfileSerializer(profile)
         return Response({
             "status" : "success",
@@ -134,3 +139,20 @@ class ProfileGet(APIView):
             "data" : serializer.data
         })
 
+
+class SwitchRoleView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request):
+
+        user = request.user
+        role = request.data.get('role')
+        
+        user.role = role
+        user.save()
+        return Response({
+            "status" : "success",
+            "message" : "Role switched successfully.",
+        })
+        

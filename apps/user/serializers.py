@@ -7,37 +7,38 @@ from apps.user.models import CustomUser, VendorProfile
 class SignUpSerializer(serializers.ModelSerializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
+    business_name = serializers.CharField(write_only=True, required=False)
+    address = serializers.CharField(write_only=True, required=False)
 
     def validate(self, attrs):
         email = attrs.get('email')
 
         if CustomUser.objects.filter(email=email).exists():
-            
+
             raise serializers.ValidationError({'email': 'User with this email already exists.'})
         return attrs
 
     class Meta:
         model = CustomUser
-        fields = ['email', 'password', 'role']
+        fields = ['email', 'password', 'role', 'business_name', 'address']
 
     def create(self, validated_data):
         email = validated_data.pop('email')
         password = validated_data.pop('password')
         role = validated_data.pop('role')
-
         
-        user = CustomUser.objects.create_user(email=email, password=password, **validated_data)
+        business_name = validated_data.pop('business_name', None)
+        address = validated_data.pop('address', None)
+        
+        user = CustomUser.objects.create_user(email=email, password=password, role=role, **validated_data)
 
         if role == 'vendor':
-
-            business_name = validated_data.pop('business_name')
-            address = validated_data.pop('address')
-
-            VendorProfile.objects.create(
-                vendor=user,
-                business_name = business_name,
-                address = address
-            )
+            if business_name and address:
+                VendorProfile.objects.create(
+                    vendor=user,
+                    business_name = business_name,
+                    address = address
+                )
 
         return user
     
@@ -72,6 +73,7 @@ class SignInSerializer(serializers.Serializer):
         return {
             'id': user.id,
             'email': user.email,
+            'role': user.role,
             'refresh_token': str(refresh),
             'access_token': str(refresh.access_token)
         }
@@ -91,22 +93,21 @@ class SignOutSerializer(serializers.Serializer):
             return ValidationError({'error': str(e)})
 
 class ChangePasswordSerializer(serializers.Serializer):
-    email = serializers.CharField()
     old_password = serializers.CharField(write_only=True)
     new_password = serializers.CharField(write_only=True)
     confirm_password = serializers.CharField(write_only=True)
 
     class Meta:
         model = CustomUser
-        fields = ['email', 'full_name', 'old_password', 'new_password', 'confirm_password']
+        fields = ['full_name', 'old_password', 'new_password', 'confirm_password']
 
     def validate(self, attrs):
-        email = attrs.get('email')
         old_password = attrs.get('old_password')
         new_password = attrs.get('new_password')
         confirm_password = attrs.get('confirm_password')
 
-        user = CustomUser.objects.filter(email=email).first()
+        user = self.context['request'].user
+        
         if not user:
             raise ValidationError({'error': 'User not found.'})
         
@@ -134,11 +135,22 @@ class ChangePasswordSerializer(serializers.Serializer):
         user.save()
         return user
 
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id','email','role']
 
 class VendorProfileSerializer(serializers.ModelSerializer):
+    vendor = CustomUserSerializer()
     class Meta:
         model = VendorProfile
-        fields = ['business_name', 'address', 'is_active']
+        fields = ['vendor','business_name', 'address', 'is_active']
 
 
+
+class UpdateVendorProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VendorProfile
+        fields = '__all__'
+        read_only_fields = ['vendor']
 
