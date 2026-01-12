@@ -9,8 +9,7 @@ from .models import CustomUser
 from .serializers import RegisterSerializer, CustomTokenObtainPairSerializer
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-
-
+from .models import VendorProfile
 
 
 class RegisterView(generics.CreateAPIView):
@@ -21,8 +20,21 @@ class RegisterView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        user.role = request.data.get('role')
+        role = request.data.get('role')
+        user.role = role
+
         user.save()
+        if role == "vendor":
+            business_name = request.data.get('business_name')
+            address = request.data.get('address')
+
+            VendorProfile.objects.create(
+            vendor=user,  
+            business_name=business_name,
+            address=address
+
+    )
+            
         
         refresh = RefreshToken.for_user(user)
 

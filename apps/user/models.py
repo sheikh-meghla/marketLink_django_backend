@@ -28,3 +28,14 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+    
+
+
+
+class VendorProfile(models.Model):
+    vendor = models.OneToOneField(CustomUser, on_delete= models.CASCADE, related_name= 'vendor_profile')
+    business_name = models.TextField(max_length=100)
+    address = models.TextField(max_length=100)
+    is_active = models.BooleanField(default=True)
+    def __str__(self):
+        return self.business_name
