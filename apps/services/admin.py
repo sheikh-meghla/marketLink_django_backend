@@ -4,7 +4,7 @@ from unfold.admin import ModelAdmin, TabularInline
 # Inline for ServiceVariant
 class ServiceVariantInline(TabularInline):
     model = ServiceVariant
-    extra = 3
+    extra = 1
     can_delete = True
 
 # Service admin with inline variants

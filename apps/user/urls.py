@@ -1,12 +1,38 @@
+from django.http import Http404
 from django.urls import path
-from .views import RegisterView, CustomTokenObtainPairView, LogoutView
-from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.views import (
+    TokenRefreshView,
+    TokenVerifyView,
+)
+from .views import (
+    SignUpAPIView,
+    SignInAPIView,
+    SignOutAPIView,
+    ChangePasswordAPIView,
+    UpdateProfileAPIView,
+    MyProfileAPIView,
+    SwitchRoleAPIView,
+)
 
 urlpatterns = [
-    path('register/', RegisterView.as_view(), name='register'),
-    path('login/', CustomTokenObtainPairView.as_view(), name='login'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('logout/', LogoutView.as_view(), name='logout'),
+
+    # Authentications
+
+    path("signup/", SignUpAPIView.as_view(), name="signup"),
+    path("signin/", SignInAPIView.as_view(), name="signin"),
+    path("signout/", SignOutAPIView.as_view(), name="signout"),
+    path("token-refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 
 
+    # password
+    path('change-password/', ChangePasswordAPIView.as_view(), name='change-password'),
+    
+    # profile
+    path('update-profile/', UpdateProfileAPIView.as_view(), name='profile-update'),
+    path('my-profile/', MyProfileAPIView.as_view(), name='profile-get'),
+
+
+    # switch role
+
+    path("switch-role/", SwitchRoleAPIView.as_view(), name="switch-role"),
 ]

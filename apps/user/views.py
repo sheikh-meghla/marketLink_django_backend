@@ -1,67 +1,159 @@
+from .models import VendorProfile
+from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.exceptions import TokenError
-from .models import CustomUser
-from .serializers import RegisterSerializer, CustomTokenObtainPairSerializer
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from .models import VendorProfile
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.validators import ValidationError
+from .serializers import (
+    SignUpSerializer,
+    SignInSerializer,
+    SignOutSerializer,
+    ChangePasswordSerializer,
+    VendorProfileSerializer,
+    UpdateVendorProfileSerializer,
+)
 
 
-class RegisterView(generics.CreateAPIView):
-    queryset = CustomUser.objects.all()
-    serializer_class = RegisterSerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        role = request.data.get('role')
-        user.role = role
-
-        user.save()
-        if role == "vendor":
-            business_name = request.data.get('business_name')
-            address = request.data.get('address')
-
-            VendorProfile.objects.create(
-            vendor=user,  
-            business_name=business_name,
-            address=address
-
-    )
-            
-        
-        refresh = RefreshToken.for_user(user)
-
-        return Response({
-            "user": {"email": user.email,"role":user.role},
-            "refresh": str(refresh),
-            "access": str(refresh.access_token),
-            
-        }, status=status.HTTP_201_CREATED)
-
-class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
-
-class LogoutView(APIView):
-    permission_classes = [IsAuthenticated]
+# Create your views here.
+# Create your views here.
+class SignUpAPIView(APIView):
+    permission_classes = []
 
     def post(self, request):
-        try:
-            refresh_token = request.data.get("refresh")
-            if not refresh_token:
-                return Response({"error": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-            return Response({"message": "Successfully logged out"}, status=status.HTTP_205_RESET_CONTENT)
-        except TokenError as e:
-            return Response({"error": f"Invalid refresh token: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = SignUpSerializer(data=request.data)
+
+        if serializer.is_valid():
+
+            serializer.save()
+
+            return Response({
+                "status" : "success",
+                "message" : "User registered successfully.",
+                "data" : serializer.data
+            })
+        raise ValidationError(serializer.errors)
+
+class SignInAPIView(APIView):
+
+    permission_classes = []
+
+    def post(self, request):
         
+        serializer = SignInSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            return Response({
+                "status" : "success",
+                "message" : "User signed in successfully.",
+                "data" : serializer.data
+            })
+        raise ValidationError(serializer.errors)
+
+
+class SignOutAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request):
+        serializer = SignOutSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response({
+                "status" : "success",
+                "message" : "Sign Out Successfull"
+            })
+        
+        raise ValidationError(serializer.errors)
+
+class ChangePasswordAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "status" : "success",
+                "message" : "Password changed successfully.",
+                "data" : serializer.data
+            })
+        raise ValidationError(serializer.errors)
+
+
+   
 
 
 
+
+class UpdateProfileAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def put(self, request):
+        user = request.user
+
+        try:
+            userProfile = VendorProfile.objects.select_related('vendor').get(vendor=user)
+            
+        except VendorProfile.DoesNotExist:
+            return Response({
+                "status" : "error",
+                "message" : "User profile not found."
+            })
+
+        serializer = UpdateVendorProfileSerializer(userProfile, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "status" : "success",
+                "message" : "Profile updated successfully.",
+                "data" : serializer.data
+            })
+        raise ValidationError(serializer.errors)
+
+
+class MyProfileAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request):
+        vendor = request.user
+
+        try:
+            profile = VendorProfile.objects.select_related('vendor').get(vendor=vendor)
+
+        except VendorProfile.DoesNotExist:
+            return Response({
+                "status" : "error",
+                "message" : "User profile not found.",
+                "data" : serializer.data
+            })
+        
+        serializer = VendorProfileSerializer(profile)
+        return Response({
+            "status" : "success",
+            "message" : "Profile retrieved successfully.",
+            "data" : serializer.data
+        })
+
+
+class SwitchRoleAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request):
+
+        user = request.user
+        role = request.data.get('role')
+        
+        user.role = role
+        user.save()
+        return Response({
+            "status" : "success",
+            "message" : "Role switched successfully.",
+        })
+        
