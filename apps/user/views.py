@@ -13,6 +13,7 @@ from .models import VendorProfile
 
 
 class RegisterView(generics.CreateAPIView):
+    permission_classes = []
     queryset = CustomUser.objects.all()
     serializer_class = RegisterSerializer
 
@@ -46,6 +47,7 @@ class RegisterView(generics.CreateAPIView):
         }, status=status.HTTP_201_CREATED)
 
 class CustomTokenObtainPairView(TokenObtainPairView):
+    permission_classes = []
     serializer_class = CustomTokenObtainPairSerializer
 
 class LogoutView(APIView):
