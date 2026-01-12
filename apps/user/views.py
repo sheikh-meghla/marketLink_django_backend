@@ -16,7 +16,8 @@ from .serializers import (
 
 
 # Create your views here.
-class SignUpView(APIView):
+# Create your views here.
+class SignUpAPIView(APIView):
     permission_classes = []
 
     def post(self, request):
@@ -34,7 +35,7 @@ class SignUpView(APIView):
             })
         raise ValidationError(serializer.errors)
 
-class SignInView(APIView):
+class SignInAPIView(APIView):
 
     permission_classes = []
 
@@ -51,7 +52,7 @@ class SignInView(APIView):
         raise ValidationError(serializer.errors)
 
 
-class SignOutView(APIView):
+class SignOutAPIView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
@@ -67,7 +68,7 @@ class SignOutView(APIView):
         
         raise ValidationError(serializer.errors)
 
-class ChangePasswordView(APIView):
+class ChangePasswordAPIView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
@@ -88,7 +89,7 @@ class ChangePasswordView(APIView):
 
 
 
-class UpdateProfileView(APIView):
+class UpdateProfileAPIView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
@@ -115,7 +116,7 @@ class UpdateProfileView(APIView):
         raise ValidationError(serializer.errors)
 
 
-class MyProfileView(APIView):
+class MyProfileAPIView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
@@ -140,7 +141,7 @@ class MyProfileView(APIView):
         })
 
 
-class SwitchRoleView(APIView):
+class SwitchRoleAPIView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 

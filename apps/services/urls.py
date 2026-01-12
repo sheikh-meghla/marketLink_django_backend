@@ -3,7 +3,10 @@ from .views import (
     ServiceListCreateAPIView,
     ServiceDetailAPIView,
     ServiceVariantListCreateAPIView,
-    ServiceVariantDetailAPIView
+    ServiceVariantDetailAPIView,
+
+    # public api
+    AllServiceApiView,
 )
 
 urlpatterns = [
@@ -14,4 +17,7 @@ urlpatterns = [
     # ServiceVariant URLs
     path('variants/', ServiceVariantListCreateAPIView.as_view(), name='variant-list-create'),
     path('variants/<int:pk>/', ServiceVariantDetailAPIView.as_view(), name='variant-detail'),
+
+    # public API
+    path("all-service/", AllServiceApiView.as_view(), name = 'all-service')
 ]
