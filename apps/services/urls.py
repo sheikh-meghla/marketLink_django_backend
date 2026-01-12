@@ -7,6 +7,7 @@ from .views import (
 
     # public api
     AllServiceApiView,
+    AllVariantApiView,
 )
 
 urlpatterns = [
@@ -18,6 +19,7 @@ urlpatterns = [
     path('variants/', ServiceVariantListCreateAPIView.as_view(), name='variant-list-create'),
     path('variants/<int:pk>/', ServiceVariantDetailAPIView.as_view(), name='variant-detail'),
 
-    # public API
-    path("all-service/", AllServiceApiView.as_view(), name = 'all-service')
+    # public API for customer
+    path("all-service/", AllServiceApiView.as_view(), name = 'all-service'),
+    path("all-variant/", AllVariantApiView.as_view(), name = 'all-variant')
 ]
