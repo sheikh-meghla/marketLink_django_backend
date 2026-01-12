@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from unfold.admin import ModelAdmin
-from .models import CustomUser
+from .models import CustomUser,VendorProfile
+
 
 @admin.register(CustomUser)
 class CustomUserAdmin(ModelAdmin):
@@ -23,5 +24,11 @@ class CustomUserAdmin(ModelAdmin):
         "fields": ("last_login", "date_joined")
     }),
 )
+
+
+@admin.register(VendorProfile)
+class VendorProfileAdmin(ModelAdmin):
+    list_display = ("id", "business_name", "address", "vendor")
+    list_filter = ("business_name", "vendor")
 
    
