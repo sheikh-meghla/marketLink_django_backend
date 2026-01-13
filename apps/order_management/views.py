@@ -165,6 +165,7 @@ class StripeWebhookAPIView(APIView):
             
 
             if PaymentEvent.objects.filter(event_id=event["id"]).exists():
+                
                 return Response({
                 "status": "ignored", 
                 "message": "Event already processed"}, 
