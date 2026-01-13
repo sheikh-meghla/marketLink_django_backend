@@ -154,3 +154,11 @@ class UpdateVendorProfileSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['vendor']
 
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    vendor_profile = VendorProfileSerializer()
+    class Meta:
+        model = CustomUser
+        fields = ['id','email','role','vendor_profile']
+
+
