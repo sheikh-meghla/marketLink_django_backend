@@ -1,0 +1,710 @@
+{
+	"info": {
+		"_postman_id": "7bcf3422-46ee-4ed2-8299-e930fa6434bc",
+		"name": "marketlink",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "51300376",
+		"_collection_link": "https://sheikh-meghla-dev-3891623.postman.co/workspace/MarketLink-Django-Backend-~f5fe97b5-46f5-4b71-879d-796e061b10b3/collection/51300376-7bcf3422-46ee-4ed2-8299-e930fa6434bc?action=share&source=collection_link&creator=51300376"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "meghla1@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "12345678",
+									"type": "text"
+								},
+								{
+									"key": "role",
+									"value": "vendor",
+									"description": "customer",
+									"type": "text"
+								},
+								{
+									"key": "business_name",
+									"value": "Rohim car hous",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "jamalpur",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{base_url}}/signup/"
+					},
+					"response": []
+				},
+				{
+					"name": "signin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var responseBody = pm.response.json();\r",
+									"\r",
+									"pm.collectionVariables.set(\"access_token\", responseBody.data.access_token);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "meghla1@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "12345678",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{base_url}}/signin/"
+					},
+					"response": []
+				},
+				{
+					"name": "token-refresh",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "refresh",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2ODkwMzYzNiwiaWF0IjoxNzY4Mjk4ODM2LCJqdGkiOiIxNWFhMGQ3N2NiZDc0ZGU3YmYxYWM3YWUxODc5N2ZhOCIsInVzZXJfaWQiOiIyIn0.oq1vSdzTcPGFU08PAfBy6pSdi2C1PU9A9_DKG1zpNNI",
+									"type": "text"
+								}
+							]
+						},
+						"url": "http://127.0.0.1:8000/api/token-refresh/"
+					},
+					"response": []
+				},
+				{
+					"name": "signout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "refresh_token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2ODg0MDE0MiwiaWF0IjoxNzY4MjM1MzQyLCJqdGkiOiJiMThmMjg3MTU0ODY0YmQ2OTRhNjg2NWI3MDdmNDdhOSIsInVzZXJfaWQiOiI1In0.GJPkZbcgE8vRk_lFcRmQnu1gzjSGUN6VQEGST_bDG3g",
+									"type": "text"
+								}
+							]
+						},
+						"url": "http://127.0.0.1:8000/api/signout/"
+					},
+					"response": []
+				},
+				{
+					"name": "my profile",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "rohim1@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "12345678",
+									"type": "text"
+								},
+								{
+									"key": "role",
+									"value": "vendor",
+									"description": "customer",
+									"type": "text"
+								},
+								{
+									"key": "business_name",
+									"value": "Rohim car hous",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "jamalpur",
+									"type": "text"
+								}
+							]
+						},
+						"url": "http://127.0.0.1:8000/api/my-profile/"
+					},
+					"response": []
+				},
+				{
+					"name": "update profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "business_name",
+									"value": "Test",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "Test",
+									"type": "text"
+								}
+							]
+						},
+						"url": "http://127.0.0.1:8000/api/update-profile/"
+					},
+					"response": []
+				},
+				{
+					"name": "switch-role",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "role",
+									"value": "customer",
+									"type": "text"
+								}
+							]
+						},
+						"url": "http://127.0.0.1:8000/api/switch-role/"
+					},
+					"response": []
+				},
+				{
+					"name": "change-password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "old_password",
+									"value": "12345678",
+									"type": "text"
+								},
+								{
+									"key": "new_password",
+									"value": "confirm_password",
+									"type": "text"
+								},
+								{
+									"key": "confirm_password",
+									"value": "confirm_password",
+									"type": "text"
+								}
+							]
+						},
+						"url": "http://127.0.0.1:8000/api/change-password/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Service",
+			"item": [
+				{
+					"name": "for customer",
+					"item": [
+						{
+							"name": "all-service",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": "{{base_url}}/all-service/"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "for vendors",
+					"item": [
+						{
+							"name": "add service",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "My serivce",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "ডিস্ক, ব্রেক ফ্লুইড চেক ও রিপ্লেসমেন্টসহ সম্পূর্ণ ব্রেক সিস্টেম সার্ভিস।",
+											"type": "text"
+										}
+									]
+								},
+								"url": "http://127.0.0.1:8000/api/services/"
+							},
+							"response": []
+						},
+						{
+							"name": "service list",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": "http://127.0.0.1:8000/api/services/"
+							},
+							"response": []
+						},
+						{
+							"name": "update service",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Car Repair Service",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "ব্রেক প্যাড, ডিস্ক, ব্রেক ফ্লুইড চেক ও রিপ্লেসমেন্টসহ সম্পূর্ণ ব্রেক সিস্টেম সার্ভিস।",
+											"type": "text"
+										}
+									]
+								},
+								"url": "http://127.0.0.1:8000/api/services/4/"
+							},
+							"response": []
+						},
+						{
+							"name": "delete service",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "vendor ",
+											"value": "4",
+											"type": "text"
+										},
+										{
+											"key": "name",
+											"value": "Car Repair Service",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "ব্রেক প্যাড, ডিস্ক, ব্রেক ফ্লুইড চেক ও রিপ্লেসমেন্টসহ সম্পূর্ণ ব্রেক সিস্টেম সার্ভিস।",
+											"type": "text"
+										},
+										{
+											"key": "variants name",
+											"value": "Premium",
+											"type": "text"
+										},
+										{
+											"key": "price",
+											"value": "1500",
+											"type": "text"
+										},
+										{
+											"key": "estimated_minutes",
+											"value": "10",
+											"type": "text"
+										},
+										{
+											"key": "stock",
+											"value": "1",
+											"type": "text"
+										}
+									]
+								},
+								"url": "http://127.0.0.1:8000/api/services/4/"
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Service variants",
+			"item": [
+				{
+					"name": "for customer",
+					"item": [
+						{
+							"name": "all-variants",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": "http://127.0.0.1:8000/api/all-variant/"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "for vendor",
+					"item": [
+						{
+							"name": "add variants",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "service",
+											"value": " 1",
+											"type": "text"
+										},
+										{
+											"key": "name",
+											"value": "Basic",
+											"type": "text"
+										},
+										{
+											"key": "price",
+											"value": " 2000",
+											"type": "text"
+										},
+										{
+											"key": "estimated_minutes",
+											"value": " 30",
+											"type": "text"
+										},
+										{
+											"key": "stock",
+											"value": " 4",
+											"type": "text"
+										}
+									]
+								},
+								"url": "http://127.0.0.1:8000/api/variants/"
+							},
+							"response": []
+						},
+						{
+							"name": "variants list",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": "http://127.0.0.1:8000/api/variants/"
+							},
+							"response": []
+						},
+						{
+							"name": "update variants",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "service",
+											"value": " 1",
+											"type": "text"
+										},
+										{
+											"key": "name",
+											"value": " Primium",
+											"type": "text"
+										},
+										{
+											"key": "price",
+											"value": " 2500",
+											"type": "text"
+										},
+										{
+											"key": "estimated_minutes",
+											"value": " 30",
+											"type": "text"
+										},
+										{
+											"key": "stock",
+											"value": "12",
+											"type": "text"
+										}
+									]
+								},
+								"url": "http://127.0.0.1:8000/api/variants/4/"
+							},
+							"response": []
+						},
+						{
+							"name": "delete variants",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "id",
+											"value": " 1",
+											"type": "text"
+										},
+										{
+											"key": "service",
+											"value": " 1",
+											"type": "text"
+										},
+										{
+											"key": "name",
+											"value": " simple",
+											"type": "text"
+										},
+										{
+											"key": "price",
+											"value": " 2500",
+											"type": "text"
+										},
+										{
+											"key": "estimated_minutes",
+											"value": " 30",
+											"type": "text"
+										},
+										{
+											"key": "stock",
+											"value": " 4",
+											"type": "text"
+										}
+									]
+								},
+								"url": "http://127.0.0.1:8000/api/variants/1/"
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Order Management",
+			"item": [
+				{
+					"name": "create-order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "variant_id",
+									"value": "3",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{base_url}}/create-order/"
+					},
+					"response": []
+				},
+				{
+					"name": "my-order-list",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://127.0.0.1:8000/api/my-order-list/"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": ""
+		},
+		{
+			"key": "access_token",
+			"value": ""
+		}
+	]
+}
