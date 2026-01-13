@@ -1,4 +1,3 @@
-# apps/orders/views.py
 import stripe
 from django.conf import settings
 from django.db import transaction
@@ -8,7 +7,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from apps.order_management.serializers import RepairOrderSerializer
 from apps.services.models import ServiceVariant
 from .models import RepairOrder
 
@@ -28,7 +28,6 @@ class OrderCreateAPIView(APIView):
                 "message": "variant_id is required"
             })
 
-        # 🔒 Concurrency-safe booking
         with transaction.atomic():
             try:
                 variant = ServiceVariant.objects.select_for_update().get(id=variant_id)
@@ -47,7 +46,6 @@ class OrderCreateAPIView(APIView):
             variant.stock -= 1
             variant.save()
 
-            # Get the VendorProfile for the service's vendor
             vendor = variant.service.vendor
 
             order = RepairOrder.objects.create(
@@ -58,7 +56,6 @@ class OrderCreateAPIView(APIView):
                 status="pending",
             )
 
-        # 💳 Stripe Checkout Session
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=["card"],
             mode="payment",
@@ -90,7 +87,22 @@ class OrderCreateAPIView(APIView):
             "checkout_url": checkout_session.url,
         })
 
+class MyOrderListAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
 
+    def get(self, request):
+        customer = request.user
+
+        my_orders = RepairOrder.objects.filter(customer=customer).order_by("-created_at")
+
+        serializer = RepairOrderSerializer(my_orders, many=True)
+
+        return Response({
+            "status": "success",
+            "message": "My orders retrieved successfully",
+            "data": serializer.data
+        })
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -160,7 +172,6 @@ class StripeWebhookAPIView(APIView):
             order.save(update_fields=["status"])
             print(f"SUCCESS: Order {order_id} marked as paid")
 
-            # 👉 enqueue background task here (optional)
 
         return Response({
             "status": "success",
