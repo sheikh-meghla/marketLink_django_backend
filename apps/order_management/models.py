@@ -25,6 +25,12 @@ class RepairOrder(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
+class PaymentEvent(models.Model):
+    event_id = models.CharField(max_length=255, unique=True)
+    order = models.ForeignKey('RepairOrder', on_delete=models.CASCADE)
+    processed_at = models.DateTimeField(auto_now_add=True)
+
+
 
 
 

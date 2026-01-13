@@ -10,7 +10,8 @@ from rest_framework import status
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from apps.order_management.serializers import RepairOrderSerializer
 from apps.services.models import ServiceVariant
-from .models import RepairOrder
+from .models import RepairOrder,PaymentEvent
+
 
 # Initialize Stripe API key
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -103,7 +104,7 @@ class MyOrderListAPIView(APIView):
             "message": "My orders retrieved successfully",
             "data": serializer.data
         })
-
+    
 
 @method_decorator(csrf_exempt, name='dispatch')
 class StripeWebhookAPIView(APIView):
@@ -113,15 +114,14 @@ class StripeWebhookAPIView(APIView):
         payload = request.body
         sig_header = request.META.get("HTTP_STRIPE_SIGNATURE")
 
-        print(f"Webhook received - Signature: {sig_header}")
-        print(f"Payload length: {len(payload)}")
-
         if not sig_header:
-            print("ERROR: No Stripe signature header found")
             return Response({
-                "status": "error",
-                "message": "No signature header"
-            }, status=status.HTTP_400_BAD_REQUEST)
+        
+            "status": "error", 
+            "message": "No signature header"}, 
+            status=status.HTTP_400_BAD_REQUEST
+            
+            )
 
         try:
             event = stripe.Webhook.construct_event(
@@ -129,52 +129,69 @@ class StripeWebhookAPIView(APIView):
                 sig_header,
                 settings.STRIPE_WEBHOOK_SECRET
             )
-            print(f"Webhook event verified: {event['type']}")
-        except ValueError as e:
-            print(f"ERROR: Invalid payload - {str(e)}")
+        except ValueError:
             return Response({
-                "status": "error",
-                "message": "Invalid payload"
-            }, status=status.HTTP_400_BAD_REQUEST)
-        except stripe.error.SignatureVerificationError as e:
-            print(f"ERROR: Signature verification failed - {str(e)}")
-            return Response({
-                "status": "error",
-                "message": "Invalid signature"
-            }, status=status.HTTP_400_BAD_REQUEST)
+            "status": "error", 
+            "message": "Invalid payload"}, 
+            status=status.HTTP_400_BAD_REQUEST
+            
+            )
+        
 
-       
+        except stripe.error.SignatureVerificationError:
+            return Response({
+            "status": "error",
+            "message": "Invalid signature"}, 
+            status=status.HTTP_400_BAD_REQUEST
+            
+            )
+        
+
         if event["type"] == "checkout.session.completed":
             session = event["data"]["object"]
-
             order_id = session["metadata"].get("order_id")
-            amount_total = session["amount_total"] / 100
+            amount_total = session["amount_total"] / 100 
 
-            print(f"Processing payment for order: {order_id}, amount: {amount_total}")
 
             try:
                 order = RepairOrder.objects.get(order_id=order_id)
             except RepairOrder.DoesNotExist:
-                print(f"ERROR: Order {order_id} not found")
                 return Response({
-                    "status": "error",
-                    "message": "Order not found"
-                }, status=status.HTTP_404_NOT_FOUND)
+                "status": "error", 
+                "message": "Order not found"},
+                status=status.HTTP_404_NOT_FOUND
+                
+                )
+            
 
+            if PaymentEvent.objects.filter(event_id=event["id"]).exists():
+                return Response({
+                "status": "ignored", 
+                "message": "Event already processed"}, 
+                status=status.HTTP_200_OK
+
+                )
+
+            
             if order.total_amount != amount_total:
-                print(f"ERROR: Amount mismatch - Expected: {order.total_amount}, Got: {amount_total}")
                 return Response({
-                    "status": "error",
-                    "message": "Amount mismatch"
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            order.status = "paid"
-            order.save(update_fields=["status"])
-            print(f"SUCCESS: Order {order_id} marked as paid")
+                "status": "error", 
+                "message": "Amount mismatch"}, 
+                status=status.HTTP_400_BAD_REQUEST
+                
+                )
 
 
-        return Response({
-            "status": "success",
-            "message": "Webhook processed successfully"
-        }, status=status.HTTP_200_OK)
+      
+            with transaction.atomic():
+                order.status = "paid"
+                order.save(update_fields=["status"])
 
+                PaymentEvent.objects.create(event_id=event["id"], order=order)
+
+                return Response({""
+                "status": "success", 
+                "message": "Webhook processed successfully"}, 
+                status=status.HTTP_200_OK
+                
+                )

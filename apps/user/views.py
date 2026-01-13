@@ -16,7 +16,6 @@ from .serializers import (
 
 
 # Create your views here.
-# Create your views here.
 class SignUpAPIView(APIView):
     permission_classes = []
 
