@@ -1,5 +1,7 @@
 from datetime import timedelta
 from pathlib import Path
+from decouple import config
+import os
 
 
 
@@ -11,7 +13,7 @@ SECRET_KEY = 'django-insecure-)f7+=ng1#%pgoww+%!9przfpc7^!m86fs!o@i1hq0(z2f2gnx4
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -46,6 +48,7 @@ INSTALLED_APPS = [
     # Local apps
     'apps.user',
     'apps.services',
+    'apps.order_management',
 
 ]
 
@@ -142,5 +145,21 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
+STATIC_URL = "/static/"
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+
+# import stripe credential from .env
+STRIPE_PUBLIC_KEY = config('STRIPE_PUBLIC_KEY')
+
+STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY') 
+
+STRIPE_WEBHOOK_SECRET = config('STRIPE_WEBHOOK_SECRET')

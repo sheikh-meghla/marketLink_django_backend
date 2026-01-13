@@ -164,7 +164,14 @@ class ServiceVariantDetailAPIView(APIView):
 
     def delete(self, request, pk):
         user = request.user
-        variant = ServiceVariant.objects.filter(service__vendor = user, id = pk).first()    
+        variant = ServiceVariant.objects.filter(service__vendor = user, id = pk).first()  
+
+        if not variant:
+            return Response({
+                "status": "error",
+                "message": "Service variant not found.",
+            }, status=status.HTTP_404_NOT_FOUND)
+              
         variant.delete()
         return Response({
             "status": "success",
