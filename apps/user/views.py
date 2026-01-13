@@ -1,17 +1,20 @@
-from .models import VendorProfile
+from .models import CustomUser, VendorProfile
 from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.validators import ValidationError
+
 from .serializers import (
     SignUpSerializer,
     SignInSerializer,
     SignOutSerializer,
     ChangePasswordSerializer,
     VendorProfileSerializer,
+
     UpdateVendorProfileSerializer,
+    UserInfoSerializer,
 )
 
 
@@ -97,7 +100,7 @@ class UpdateProfileAPIView(APIView):
 
         try:
             userProfile = VendorProfile.objects.select_related('vendor').get(vendor=user)
-            
+
         except VendorProfile.DoesNotExist:
             return Response({
                 "status" : "error",
@@ -122,22 +125,47 @@ class MyProfileAPIView(APIView):
     def get(self, request):
         vendor = request.user
 
-        try:
-            profile = VendorProfile.objects.select_related('vendor').get(vendor=vendor)
-
-        except VendorProfile.DoesNotExist:
-            return Response({
-                "status" : "error",
-                "message" : "User profile not found.",
-                "data" : serializer.data
-            })
+        user_info = CustomUser.objects.prefetch_related('vendor_profile').get(id=vendor.id)
+        serializer = UserInfoSerializer(user_info)
         
-        serializer = VendorProfileSerializer(profile)
+
         return Response({
             "status" : "success",
             "message" : "Profile retrieved successfully.",
             "data" : serializer.data
         })
+
+
+class CreateVendorProfile(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request):
+        user = request.user
+
+        business_name = request.data.get('business_name')
+        address = request.data.get('address')
+
+        if VendorProfile.objects.filter(vendor = user).exists():
+            return Response({
+                "status" : "error",
+                "message" : "You are already a vendor"
+            })
+
+        VendorProfile.objects.create(
+            vendor = user,
+            business_name = business_name,
+            address = address
+        )
+
+        user.role = 'vendor'
+        user.save()
+
+        return Response({
+            "status" : "success",
+            "message" : "Vendor Profile create successfull"
+        })
+
 
 
 class SwitchRoleAPIView(APIView):

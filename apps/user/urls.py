@@ -4,13 +4,23 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 from .views import (
+    # auth
     SignUpAPIView,
     SignInAPIView,
     SignOutAPIView,
+
+    # password Change
     ChangePasswordAPIView,
+
+    #profile
     UpdateProfileAPIView,
     MyProfileAPIView,
+    CreateVendorProfile,
+
+    # witch role
+
     SwitchRoleAPIView,
+
 )
 
 urlpatterns = [
@@ -27,6 +37,7 @@ urlpatterns = [
     path('change-password/', ChangePasswordAPIView.as_view(), name='change-password'),
     
     # profile
+    path('create-vendor-profile/',CreateVendorProfile.as_view(), name='create-vendor-profile'),
     path('update-profile/', UpdateProfileAPIView.as_view(), name='profile-update'),
     path('my-profile/', MyProfileAPIView.as_view(), name='profile-get'),
 
