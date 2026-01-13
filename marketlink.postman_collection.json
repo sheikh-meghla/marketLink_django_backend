@@ -20,7 +20,7 @@
 							"formdata": [
 								{
 									"key": "email",
-									"value": "meghla1@gmail.com",
+									"value": "test@gmail.com",
 									"type": "text"
 								},
 								{
@@ -30,7 +30,7 @@
 								},
 								{
 									"key": "role",
-									"value": "vendor",
+									"value": "customer",
 									"description": "customer",
 									"type": "text"
 								},
@@ -86,7 +86,7 @@
 							"formdata": [
 								{
 									"key": "email",
-									"value": "meghla1@gmail.com",
+									"value": "test@gmail.com",
 									"type": "text"
 								},
 								{
@@ -280,6 +280,36 @@
 							]
 						},
 						"url": "http://127.0.0.1:8000/api/change-password/"
+					},
+					"response": []
+				},
+				{
+					"name": "create-vendor-profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "business_name",
+									"value": "Test",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "Test",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{base_url}}/create-vendor-profile/"
 					},
 					"response": []
 				}
