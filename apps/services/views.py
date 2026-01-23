@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Service, ServiceVariant
+from .models import Service, ServiceBooking, ServiceVariant
 from .serializers import ServiceSerializer, ServiceVariantSerializer, GetAllServiceSerializer,GetAllServiceVariantSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
@@ -210,3 +210,24 @@ class AllVariantApiView(APIView):
             "data" : serializer.data
         })
 
+
+
+class BookAServiceAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request):
+
+        service_id = request.data.get('service_id')
+        variant_id = request.data.get('variant_id')
+        customer = request.user
+
+        ServiceBooking.objects.create(
+            service_id=service_id,
+            variant_id=variant_id,
+            customer=customer
+        )
+        return Response({
+            "status" : "success",
+            "message" : "Service booked successfully.",
+        })

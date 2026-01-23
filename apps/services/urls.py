@@ -8,6 +8,7 @@ from .views import (
     # public api
     AllServiceApiView,
     AllVariantApiView,
+    BookAServiceAPIView  
 )
 
 urlpatterns = [
@@ -21,5 +22,10 @@ urlpatterns = [
 
     # public API for customer
     path("all-service/", AllServiceApiView.as_view(), name = 'all-service'),
-    path("all-variant/", AllVariantApiView.as_view(), name = 'all-variant')
+    path("all-variant/", AllVariantApiView.as_view(), name = 'all-variant'),
+
+    # service booking
+
+    path("book-a-service/",BookAServiceAPIView.as_view(), name = 'book-a-service')
+
 ]

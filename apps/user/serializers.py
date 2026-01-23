@@ -16,6 +16,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         if CustomUser.objects.filter(email=email).exists():
 
             raise serializers.ValidationError({'email': 'User with this email already exists.'})
+        
         return attrs
 
     class Meta:
