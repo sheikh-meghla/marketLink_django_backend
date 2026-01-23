@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Service, ServiceVariant
+from .models import Service, ServiceBooking, ServiceVariant
 from unfold.admin import ModelAdmin, TabularInline
 # Inline for ServiceVariant
 class ServiceVariantInline(TabularInline):
@@ -21,3 +21,13 @@ class ServiceVariantAdmin(ModelAdmin):  # ModelAdmin Django-এর
     list_display = ('name', 'service', 'price', 'estimated_minutes', 'stock')
     search_fields = ('name', 'service__name', 'service__vendor__business_name')
     list_filter = ('service__vendor',)
+
+
+@admin.register(ServiceBooking)
+class ServiceBookingAdmin(ModelAdmin):
+    list_display = ('service', 'variant', 'customer','vendor_name')
+    search_fields = ('service__name', 'variant__name',)
+    list_filter = ('service__vendor',)
+
+    def vendor_name(self, obj):
+        return obj.service.vendor.vendor_profile.business_name

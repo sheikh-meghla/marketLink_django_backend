@@ -18,3 +18,8 @@ class ServiceVariant(models.Model):
 
     def __str__(self):
         return self.name
+    
+class ServiceBooking(models.Model):
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='service_bookings')
+    variant = models.ForeignKey(ServiceVariant, on_delete=models.CASCADE, related_name='variant_bookings')
+    customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='customer_bookings')
