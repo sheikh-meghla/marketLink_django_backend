@@ -3,6 +3,8 @@ from pathlib import Path
 from decouple import config
 import os
 
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 
 
 
@@ -49,6 +51,7 @@ INSTALLED_APPS = [
     'apps.user',
     'apps.services',
     'apps.order_management',
+    'apps.product',
 
 ]
 
@@ -163,3 +166,73 @@ STRIPE_PUBLIC_KEY = config('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY') 
 
 STRIPE_WEBHOOK_SECRET = config('STRIPE_WEBHOOK_SECRET')
+
+
+
+UNFOLD = {
+    
+    "SIDEBAR": {
+        "show_search": True,  # Search in applications and models names
+        "command_search": True,  # Replace the sidebar search with the command search
+        "show_all_applications": True,  # Dropdown with all applications and models
+        "navigation": [
+            {
+                "title": _("User Management"),
+                "separator": True,  # Top border
+                "collapsible": True,  # Collapsible group of links
+                "items": [
+                   
+                    {
+                        "title": _("Users"),
+                        "icon": "people",
+                        "link": reverse_lazy("admin:user_customuser_changelist"),
+                    },
+                    {
+                        "title": _("Vendor Profiles"),
+                        "icon": "store",
+                        "link": reverse_lazy("admin:user_vendorprofile_changelist"),
+                    },
+                    
+                ],
+            },
+             {
+                "title": _("Product Management"),
+                "separator": True,  # Top border
+                "collapsible": True,  # Collapsible group of links
+                "items": [
+                   
+                    {
+                        "title": _("Categories"),
+                        "icon": "category",
+                        "link": reverse_lazy("admin:product_productcategory_changelist"),
+                    },
+                    {
+                        "title": _(" Products"),
+                        "icon": "store",
+                        "link": reverse_lazy("admin:product_product_changelist"),
+                    },
+                    
+                ],
+            },
+            {
+                "title": _("Order Management"),
+                "separator": True,  # Top border
+                "collapsible": True,  # Collapsible group of links
+                "items": [
+                   
+                    {
+                        "title": _("RepairOrders"),
+                        "icon": "orders",
+                        "link": reverse_lazy("admin:order_management_repairorder_changelist"),
+                    },
+                   
+                    
+                ],
+            },
+        ],
+    },
+   
+}
+
+
+
