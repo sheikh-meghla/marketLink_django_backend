@@ -17,9 +17,11 @@ class ServiceListCreateAPIView(APIView):
     def get(self, request):
 
         user = request.user
+        
         services = Service.objects.filter(vendor = user)
 
         serializer = ServiceSerializer(services,  many=True)
+        
         return Response({
             "status" : "success",
             "message" : "Service retrieved successfully.",
